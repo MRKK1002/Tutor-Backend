@@ -38,7 +38,7 @@ async function main() {
     console.log('✅ Admin created successfully!');
     console.log('   Email:    admin@wantedtutors.com');
     console.log('   Password: Admin@123');
-    console.log('   URL:      http://localhost:3000/admin/login');
+    console.log('   URL:      http://localhost:8000/admin/login');
     console.log('');
 
   } catch (err) {

@@ -170,7 +170,7 @@ async function seed() {
 
     console.log('');
     console.log('Now tutors can browse listings at:');
-    console.log('  http://localhost:3000/tutor/listings');
+    console.log('  http://localhost:8000/tutor/listings');
     console.log('');
 
   } catch (err) {

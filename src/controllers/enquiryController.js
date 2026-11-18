@@ -72,14 +72,16 @@ const getListings = async (req, res) => {
 
   const total = await Enquiry.countDocuments(filter);
 
-  // Check which enquiries this tutor has already unlocked
-  const enquiryIds = enquiries.map((e) => e._id);
-  const myAccess = await ContactAccess.find({
-    tutor: req.user._id,
-    enquiry: { $in: enquiryIds },
-  }).select('enquiry');
-
-  const unlockedIds = new Set(myAccess.map((a) => a.enquiry.toString()));
+  // Check which enquiries this tutor has already unlocked (only if logged in)
+  let unlockedIds = new Set();
+  if (req.user?._id) {
+    const enquiryIds = enquiries.map((e) => e._id);
+    const myAccess = await ContactAccess.find({
+      tutor: req.user._id,
+      enquiry: { $in: enquiryIds },
+    }).select('enquiry');
+    unlockedIds = new Set(myAccess.map((a) => a.enquiry.toString()));
+  }
 
   const listingsWithAccess = enquiries.map((e) => ({
     ...e.toObject(),
@@ -108,8 +110,10 @@ const getListingDetail = async (req, res) => {
     return res.status(404).json({ success: false, message: 'Listing not found' });
   }
 
-  // Check access
-  const access = await ContactAccess.findOne({ tutor: req.user._id, enquiry: enquiry._id });
+  // Check access (only if logged in)
+  const access = req.user?._id
+    ? await ContactAccess.findOne({ tutor: req.user._id, enquiry: enquiry._id })
+    : null;
 
   // Always fetch live fee from admin
   const admin = await Admin.findOne().select('termsAndConditions contactAccessFee');

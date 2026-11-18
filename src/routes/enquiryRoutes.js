@@ -21,8 +21,8 @@ router.put('/admin/:id/status',   protect, adminOnly, adminUpdateStatus);
 router.put('/admin/:id',          protect, adminOnly, adminEditEnquiry);
 
 // ── TUTOR (after admin routes) ────────────────────────────────────────────────
-router.get('/',              protect, tutorOnly, getListings);
-router.get('/:id/contact',   protect, tutorOnly, getContactDetails);
-router.get('/:id',           protect, tutorOnly, getListingDetail);
+router.get('/',              getListings);                              // PUBLIC — no login needed
+router.get('/:id/contact',   protect, tutorOnly, getContactDetails);   // PRIVATE — requires login
+router.get('/:id',           getListingDetail);                         // PUBLIC — no login needed
 
 module.exports = router;

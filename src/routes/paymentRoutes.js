@@ -1,10 +1,11 @@
 const router = require('express').Router();
-const { initiatePayment, verifyPayment, webhook, getMyPayments, adminGetPayments, adminGetAccessLog } = require('../controllers/paymentController');
+const { initiatePayment, verifyPayment, verifyPaymentDev, webhook, getMyPayments, adminGetPayments, adminGetAccessLog } = require('../controllers/paymentController');
 const { protect, tutorOnly, adminOnly } = require('../middleware/auth');
 
 // TUTOR
 router.post('/initiate', protect, tutorOnly, initiatePayment);
 router.post('/verify', protect, tutorOnly, verifyPayment);
+router.post('/verify-dev', protect, tutorOnly, verifyPaymentDev);
 router.get('/my-history', protect, tutorOnly, getMyPayments);
 
 // WEBHOOK — no auth (Razorpay calls this)

@@ -18,7 +18,7 @@ app.use(helmet({
 }));
 app.use(cors({
   origin: [
-    'http://localhost:3000',
+    'http://localhost:8000',
     'http://localhost:3001',
     'http://localhost:5173',
     process.env.CLIENT_URL,

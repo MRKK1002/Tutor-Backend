@@ -190,4 +190,48 @@ const adminGetAccessLog = async (req, res) => {
   res.status(200).json({ success: true, count: logs.length, logs });
 };
 
-module.exports = { initiatePayment, verifyPayment, webhook, getMyPayments, adminGetPayments, adminGetAccessLog };
+// @desc    DEV ONLY — bypass payment, directly unlock contact
+// @route   POST /api/payments/verify-dev
+// @access  Private (tutor)
+const verifyPaymentDev = async (req, res) => {
+  const { paymentId, enquiryId } = req.body;
+
+  if (!paymentId || !enquiryId) {
+    return res.status(400).json({ success: false, message: 'paymentId and enquiryId required' });
+  }
+
+  // Mark payment as successful directly
+  const payment = await Payment.findByIdAndUpdate(
+    paymentId,
+    {
+      status: 'successful',
+      isVerified: true,
+      razorpayPaymentId: `dev_${Date.now()}`,
+      razorpaySignature: `dev_sig_${Date.now()}`,
+    },
+    { new: true }
+  );
+
+  if (!payment) {
+    return res.status(404).json({ success: false, message: 'Payment record not found' });
+  }
+
+  // Create ContactAccess record
+  await ContactAccess.findOneAndUpdate(
+    { tutor: req.user._id, enquiry: enquiryId },
+    {
+      tutor: req.user._id,
+      enquiry: enquiryId,
+      payment: payment._id,
+      accessGrantedAt: new Date(),
+    },
+    { upsert: true, new: true }
+  );
+
+  res.status(200).json({
+    success: true,
+    message: 'Contact details unlocked successfully.',
+  });
+};
+
+module.exports = { initiatePayment, verifyPayment, verifyPaymentDev, webhook, getMyPayments, adminGetPayments, adminGetAccessLog };
