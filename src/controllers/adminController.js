@@ -100,4 +100,35 @@ const seedAdmin = async () => {
   }
 };
 
-module.exports = { getDashboard, getTutors, updateTutorStatus, getSettings, updateSettings, seedAdmin };
+// @desc    Get hero content — PUBLIC
+// @route   GET /api/admin/hero
+// @access  Public
+const getHeroContent = async (req, res) => {
+  const admin = await Admin.findOne().select('heroHeading heroSubtext heroImageUrl');
+  res.status(200).json({
+    success: true,
+    hero: {
+      heading:  admin?.heroHeading  || 'Find the Perfect Home Tutor for Your Child',
+      subtext:  admin?.heroSubtext  || "Connect with experienced and verified tutors in your area. Post your requirement and get the best tutors for your child's success.",
+      imageUrl: admin?.heroImageUrl || '',
+    },
+  });
+};
+
+// @desc    Update hero content — ADMIN
+// @route   PUT /api/admin/hero
+// @access  Private (admin)
+const updateHeroContent = async (req, res) => {
+  const { heroHeading, heroSubtext, heroImageUrl } = req.body;
+  const updates = {};
+  if (heroHeading)  updates.heroHeading  = heroHeading;
+  if (heroSubtext)  updates.heroSubtext  = heroSubtext;
+  if (heroImageUrl !== undefined) updates.heroImageUrl = heroImageUrl;
+
+  const admin = await Admin.findByIdAndUpdate(req.user._id, updates, { new: true })
+    .select('heroHeading heroSubtext heroImageUrl');
+
+  res.status(200).json({ success: true, message: 'Hero content updated', hero: admin });
+};
+
+module.exports = { getDashboard, getTutors, updateTutorStatus, getSettings, updateSettings, getHeroContent, updateHeroContent, seedAdmin };

@@ -14,19 +14,20 @@ const adminSchema = new mongoose.Schema(
       default:
         'By proceeding with the payment, you agree that this fee is non-refundable. Contact details are for tutoring purposes only and must not be misused.',
     },
+    // ── Hero Section CMS ─────────────────────────────────────────────────────
+    heroHeading:  { type: String, default: 'Find the Perfect Home Tutor for Your Child' },
+    heroSubtext:  { type: String, default: "Connect with experienced and verified tutors in your area. Post your requirement and get the best tutors for your child's success." },
+    heroImageUrl: { type: String, default: '' },
   },
   { timestamps: true }
 );
-
 // Hash password before saving — Mongoose 9 style (no next())
 adminSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
-
 adminSchema.methods.matchPassword = async function (entered) {
   return await bcrypt.compare(entered, this.password);
 };
-
 module.exports = mongoose.model('Admin', adminSchema);
